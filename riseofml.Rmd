@@ -1,0 +1,84 @@
+---
+title: "The rise of Machine Learning the fields of life science and biomedical sciences"
+author: "Emmanuel Kagning Tsinda"
+date: "October 13, 2018"
+output: html_document
+---
+
+Here, I'm going to make a visual representation of the number of papers published in the field of medecine. Let's interrogate Pubmed, and look at the publication trend of machine learning scientific papers published in pubmed database. It seems that the 1st ever neural network was made in 1957 (https://www.forbes.com/sites/bernardmarr/2016/02/19/a-short-history-of-machine-learning-every-manager-should-read/#2b96042815e7) 
+
+
+
+```{r}
+library(rentrez)
+library(ggplot2)
+library(plotly)
+search_year <- function(year, term){
+  query <- paste(term, "AND (", year, "[PDAT])")
+  entrez_search(db="pubmed", term=query, retmax=0)$count
+}
+
+year <- 1957:2014
+
+```
+
+
+Let's create a vector named papers
+```{r}
+papers <- sapply(year, search_year, term="machine learning", USE.NAMES=FALSE)
+
+```
+
+
+Let's build a dataframe containing the number of papers and year of publication 
+```{r}
+d = data.frame(year=year, number_of_papers=papers);d
+```
+
+
+
+Now, let's make an interactive plot displaying the number of papers and year of publication. 
+
+```{r}
+
+p= plot_ly(x=~year, y=~number_of_papers, data=d, type="scatter", mode="marker", marker = list(color = "blue"))  %>%  
+  layout(title = "The rise of machine learning in biomedical sciences and life sciences", 
+    annotations = list(x = 1, y = -0.1, text = "based on data from NCBI/PUBMED", 
+      showarrow = F, xref='paper', yref='paper',xanchor='right', yanchor='auto', xshift=0, yshift=0, font=list(size=10, color="blue"),xaxis = "x", yaxis = "y")
+ )
+
+```
+
+There is a sharp increase of the number of publications from the year 2000. To better visualize that, lets build another plot
+
+```{r}
+
+plot_ly(x=~year, y=~number_of_papers, data=d[34:58, ], type="scatter", mode="marker", marker = list(color = "blue"), linetype = I("dash"))  %>%  
+  layout(title = "The rise of machine learning in biomedical sciences and life sciences (1990-2017)", 
+    annotations = list(x = 1, y = -0.1, text = "based on data from NCBI/PUBMED", 
+      showarrow = F, xref='paper', yref='paper',xanchor='right', yanchor='auto', xshift=0, yshift=0, font=list(size=10, color="blue"),xaxis = "x", yaxis = "y")
+ )
+
+# Create a shareable link to your chart
+# Set up API credentials: https://plot.ly/r/getting-started
+chart_link = api_create(p, filename="scatter2d-axis-labels")
+chart_link
+```
+
+
+
+
+When I was trying to discuss this result, I realized Hashem et al, 2017 (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5760972/) found a quite similar trend, though he used a different R package (RISmed package) and plotted the proportion of papers per million. I think that the linear increase between 2005-2010 may be explained by the increased use of 3rd generation sequencing methods, which gave rise to big genomic data. Analysing such big data often requires dimension reduction and other machine learning methods.  Linear regression models were found by Hashem et al, to be the most dominant machine learning techniques in the life sciences over the past three decades. 
+
+
+In conclusion, there are more and more health researchers who are using machine learning algorithms. I can't wait to see the impact deep learning algorithms in life science and medicine!   
+
+
+
+
+# Create a shareable link to your chart
+# Set up API credentials: https://plot.ly/r/getting-started
+chart_link = api_create(p, filename="scatter2d-axis-labels")
+chart_link
+
+
